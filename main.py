@@ -1,7 +1,8 @@
 from PyQt4 import QtCore, QtGui, uic
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
+from Pytes import pytes
 import opnMap, newMap
-import pytes, sys
+import sys
 
 class MainWindow(QtGui.QDialog):
     def __init__(self):

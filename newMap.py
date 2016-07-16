@@ -1,6 +1,7 @@
 from PyQt4 import QtCore, QtGui, uic
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
-import sys, pytes
+from Pytes import pytes
+import sys
 
 class newMapWindow(QtGui.QWidget):
     def __init__(self):
