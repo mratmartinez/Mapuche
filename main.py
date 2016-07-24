@@ -1,17 +1,17 @@
-from PyQt4 import QtCore, QtGui, uic
-from PyQt4.QtCore import pyqtSignal, pyqtSlot
+from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from Pytes import pytes
 import opnMap, newMap
 import sys
 
-class MainWindow(QtGui.QDialog):
+class MainWindow(QtWidgets.QDialog):
     def __init__(self):
         super(MainWindow,self).__init__()
         uic.loadUi('UI/Main.ui', self)
         self.opnMp = opnMap.openMapWindow()
         self.newMp = newMap.newMapWindow()
-        self.connect(self.opnMapbtn, QtCore.SIGNAL("clicked()"), self.openMap)
-        self.connect(self.newMapbtn, QtCore.SIGNAL("clicked()"), self.newMap)
+        self.opnMapbtn.clicked.connect(self.openMap)
+        self.newMapbtn.clicked.connect(self.newMap)
     
     @pyqtSlot()
     def openMap(self):
@@ -21,7 +21,7 @@ class MainWindow(QtGui.QDialog):
         self.newMp.show()
         
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())

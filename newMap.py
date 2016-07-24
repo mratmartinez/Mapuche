@@ -1,14 +1,16 @@
-from PyQt4 import QtCore, QtGui, uic
-from PyQt4.QtCore import pyqtSignal, pyqtSlot
+from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from Pytes import pytes
 import sys
 
-class newMapWindow(QtGui.QWidget):
+class newMapWindow(QtWidgets.QDialog   ):
     def __init__(self):
         super(newMapWindow,self).__init__()
         uic.loadUi('UI/newMap.ui', self)
-        self.connect(self.saveBox, QtCore.SIGNAL("accepted()"), self.save)
-        self.connect(self.saveBox, QtCore.SIGNAL("rejected()"), self.cancel)
+        self.saveBox.accepted.connect(self.save)
+        self.saveBox.rejected.connect(self.cancel)
+        #~ self.connect(self.saveBox, QtCore.SIGNAL("accepted()"), self.save)
+        #~ self.connect(self.saveBox, QtCore.SIGNAL("rejected()"), self.cancel)
         self.items = ["Mapache v1"]
         for i in self.items:
             self.listWidget.addItem(i)

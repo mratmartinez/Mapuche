@@ -1,11 +1,11 @@
-from PyQt4 import QtCore, QtGui, uic
-from PyQt4.QtCore import pyqtSignal, pyqtSlot
+from PyQt5 import QtWidgets, uic
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
-class openMapWindow(QtGui.QWidget):
+class openMapWindow(QtWidgets.QDialog):
     def __init__(self):
         super(openMapWindow,self).__init__()
         uic.loadUi('UI/openMap.ui', self)
-        self.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.open)
+        self.buttonBox.accepted.connect(self.open)
     
     @pyqtSlot()
     def open(self):
