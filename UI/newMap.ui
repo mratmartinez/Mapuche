@@ -84,7 +84,7 @@
     <item>
      <widget class="QLabel" name="label_4">
       <property name="text">
-       <string>Height / Weight (INT)</string>
+       <string>Height / Weight (INT):</string>
       </property>
      </widget>
     </item>

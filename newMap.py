@@ -9,8 +9,6 @@ class newMapWindow(QtWidgets.QDialog   ):
         uic.loadUi('UI/newMap.ui', self)
         self.saveBox.accepted.connect(self.save)
         self.saveBox.rejected.connect(self.cancel)
-        #~ self.connect(self.saveBox, QtCore.SIGNAL("accepted()"), self.save)
-        #~ self.connect(self.saveBox, QtCore.SIGNAL("rejected()"), self.cancel)
         self.items = ["Mapache v1"]
         for i in self.items:
             self.listWidget.addItem(i)
@@ -38,10 +36,9 @@ class newMapWindow(QtWidgets.QDialog   ):
         try:
             self.tiles = int(self.sizeEdit.text())
         except:
-            QtGui.QMessageBox.about(self, 'Error','Size can only be a number')
-            return
+            return QtWidgets.QMessageBox.about(self, 'Error','Size can only be a number')
         if self.nameEdit.text() == "":
-            QtGui.QMessageBox.about(self, 'Error','You didn\'t wrote a name to your file!')
+            QtWidgets.QMessageBox.about(self, 'Error','You didn\'t wrote a name to your file!')
         else:
             while len(str(self.tiles))>1:
                 self.tiles = int(self.tiles/10)
