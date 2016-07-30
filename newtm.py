@@ -5,7 +5,7 @@ class newtmWindow(QtWidgets.QDialog):
     def __init__(self):
         super(newtmWindow,self).__init__()
         uic.loadUi('UI/newtm.ui', self)
-        self.tileWHEdit.setText(str(self.horizontalSlider.value()))
+        self.refresh()
         self.saveBox.accepted.connect(self.save)
         self.saveBox.rejected.connect(self.cancel)
         self.horizontalSlider.valueChanged.connect(self.refresh)

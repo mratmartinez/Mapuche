@@ -3,7 +3,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from Pytes import pytes
 import sys
 
-class newMapWindow(QtWidgets.QDialog   ):
+class newMapWindow(QtWidgets.QDialog):
     def __init__(self):
         super(newMapWindow,self).__init__()
         uic.loadUi('UI/newMap.ui', self)
