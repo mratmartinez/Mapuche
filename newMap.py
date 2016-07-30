@@ -43,8 +43,9 @@ class newMapWindow(QtWidgets.QDialog):
             while len(str(self.tiles))>1:
                 self.tiles = int(self.tiles/10)
                 self.counter += 1
-            self.archivo = self.nameEdit.text() + "." + self.formats.lower()
+            self.archivo = QtWidgets.QFileDialog(self).getExistingDirectory() + '/' + self.nameEdit.text() + "." + self.formats.lower()
             self.writefile()
+
 
     def cancel(self):
         self.close()

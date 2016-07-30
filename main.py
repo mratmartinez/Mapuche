@@ -1,14 +1,13 @@
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from Pytes import pytes
-import opnMap, newMap, newtm
+import newMap, newtm
 import sys
 
 class MainWindow(QtWidgets.QDialog):
     def __init__(self):
         super(MainWindow,self).__init__()
         uic.loadUi('UI/Main.ui', self)
-        self.opnMp = opnMap.openMapWindow()
         self.newMp = newMap.newMapWindow()
         self.newTm = newtm.newtmWindow()
         self.opnMapbtn.clicked.connect(self.openMap)
@@ -17,7 +16,8 @@ class MainWindow(QtWidgets.QDialog):
 
     @pyqtSlot()
     def openMap(self):
-        self.opnMp.show()
+        self.mapfile = QtWidgets.QFileDialog(self).getOpenFileName(self, 'Open file',"","Mapache v1 Maps (*.ma1)")
+        print(self.mapfile)
 
     def newMap(self):
         self.newMp.show()
