@@ -14,16 +14,16 @@ class newMapWindow(QtWidgets.QDialog):
             self.listWidget.addItem(i)
     
     def writefile(self):
-        file = open(self.archivo, "w")
+        mapfile = open(self.archivo, "w")
         self.header = self.formats + str(self.layer) + str(self.tiles) + " "
-        file.write(self.header)
-        file.close()
-        file = pytes.Pyte(self.archivo)
+        mapfile.write(self.header)
+        mapfile.close()
+        mapfile = pytes.Pyte(self.archivo)
         for l in range(self.layer):
-            file.op.read()
+            mapfile.op.read()
             for i in range((self.tiles*(10**self.counter))**2):
-                file.write(0b00000000)
-        file.stapit()
+                mapfile.write(0b00000000)
+        mapfile.stapit()
         self.close()
         
     
@@ -49,3 +49,4 @@ class newMapWindow(QtWidgets.QDialog):
 
     def cancel(self):
         self.close()
+    
