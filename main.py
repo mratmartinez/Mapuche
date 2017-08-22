@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from Pytes import pytes
@@ -8,6 +9,8 @@ class MainWindow(QtWidgets.QDialog):
     def __init__(self):
         super(MainWindow,self).__init__()
         uic.loadUi('UI/Main.ui', self)
+        self.layFour.setDisabled(True)
+        self.mapPropbtn.setDisabled(True)
         self.newMp = newMap.newMapWindow()
         self.newTm = newtm.newtmWindow()
         self.opnMapbtn.clicked.connect(self.openMap)

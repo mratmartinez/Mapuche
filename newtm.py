@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QSize
+from PyQt5.QtGui import QIntValidator
 from PIL import Image
 import os, tempfile
 
@@ -21,6 +22,7 @@ class newtmWindow(QtWidgets.QDialog):
     def __init__(self):
         super(newtmWindow,self).__init__()
         uic.loadUi('UI/newtm.ui', self)
+        self.tileWHEdit.setValidator(QIntValidator(10,100))
         self.refresh()
         self.chooseBtn.clicked.connect(self.pickfolder)
         self.saveBox.accepted.connect(self.save)

@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtGui import QIntValidator
 from Pytes import pytes
 import sys
 
@@ -7,8 +8,11 @@ class newMapWindow(QtWidgets.QDialog):
     def __init__(self):
         super(newMapWindow,self).__init__()
         uic.loadUi('UI/newMap.ui', self)
+        self.sizeEdit.setValidator(QIntValidator(1,950))
+        self.label_2.setText("Layers: " + str(self.horizontalSlider.value()))
         self.saveBox.accepted.connect(self.save)
         self.saveBox.rejected.connect(self.cancel)
+        self.horizontalSlider.valueChanged.connect(self.updateLabel)
         self.items = ["Mapache v1"]
         for i in self.items:
             self.listWidget.addItem(i)
@@ -50,3 +54,5 @@ class newMapWindow(QtWidgets.QDialog):
     def cancel(self):
         self.close()
     
+    def updateLabel(self):
+        self.label_2.setText("Layers: " + str(self.horizontalSlider.value()))

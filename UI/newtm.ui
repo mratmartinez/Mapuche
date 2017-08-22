@@ -9,9 +9,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>441</width>
-    <height>306</height>
+    <width>495</width>
+    <height>345</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>495</width>
+    <height>345</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>495</width>
+    <height>345</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>New Tilemap</string>
@@ -21,11 +33,20 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>151</width>
-     <height>251</height>
+     <width>183</width>
+     <height>281</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
     <item>
      <widget class="QLabel" name="label">
       <property name="text">
@@ -45,13 +66,22 @@
   <widget class="QWidget" name="verticalLayoutWidget_3">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>220</y>
-     <width>261</width>
-     <height>81</height>
+     <x>200</x>
+     <y>240</y>
+     <width>291</width>
+     <height>51</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
     <item>
      <widget class="QLabel" name="label_3">
       <property name="text">
@@ -66,28 +96,27 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QDialogButtonBox" name="saveBox">
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-      </property>
-      <property name="centerButtons">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QWidget" name="verticalLayoutWidget_2">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>200</x>
      <y>10</y>
-     <width>261</width>
-     <height>121</height>
+     <width>291</width>
+     <height>141</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
     <item>
      <widget class="QLabel" name="label_2">
       <property name="text">
@@ -103,23 +132,32 @@
   <widget class="QWidget" name="verticalLayoutWidget_4">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>140</y>
-     <width>261</width>
+     <x>200</x>
+     <y>160</y>
+     <width>298</width>
      <height>71</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_5">
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Tile Width / Height (INT):</string>
+         <string>Tile Width / Height: (Max. 100)</string>
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignRight">
+      <item>
        <widget class="QLineEdit" name="tileWHEdit">
         <property name="maxLength">
          <number>3</number>
@@ -164,20 +202,30 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_5">
+  <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>270</y>
-     <width>154</width>
-     <height>31</height>
+     <y>300</y>
+     <width>481</width>
+     <height>41</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
      <widget class="QPushButton" name="chooseBtn">
       <property name="text">
        <string>Choose Tilemap Folders</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDialogButtonBox" name="saveBox">
+      <property name="standardButtons">
+       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+      </property>
+      <property name="centerButtons">
+       <bool>false</bool>
       </property>
      </widget>
     </item>

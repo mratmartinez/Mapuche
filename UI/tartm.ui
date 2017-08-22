@@ -10,6 +10,18 @@
     <height>382</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>741</width>
+    <height>382</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>741</width>
+    <height>382</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>TAR TileMap Creation</string>
   </property>
@@ -18,11 +30,20 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>161</width>
-     <height>120</height>
+     <width>171</width>
+     <height>133</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
     <item>
      <widget class="QLabel" name="label">
       <property name="text">
@@ -63,13 +84,22 @@
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>179</x>
+     <x>189</x>
      <y>9</y>
      <width>551</width>
      <height>371</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
     <item row="0" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
@@ -118,12 +148,21 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>140</y>
-     <width>160</width>
-     <height>171</height>
+     <y>150</y>
+     <width>171</width>
+     <height>231</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <property name="leftMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>5</number>
+    </property>
+    <property name="bottomMargin">
+     <number>3</number>
+    </property>
     <item>
      <widget class="QGraphicsView" name="graphicsView"/>
     </item>
@@ -134,20 +173,14 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QDialogButtonBox" name="buttonBox">
+      <property name="standardButtons">
+       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      </property>
+     </widget>
+    </item>
    </layout>
-  </widget>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>350</y>
-     <width>161</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
   </widget>
  </widget>
  <resources/>
