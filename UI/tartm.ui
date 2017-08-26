@@ -167,7 +167,7 @@
      <widget class="QGraphicsView" name="graphicsView"/>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="blankBtn">
       <property name="text">
        <string>Mark as 'Blank Tile'</string>
       </property>

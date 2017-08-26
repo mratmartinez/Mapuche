@@ -1,8 +1,9 @@
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QSize
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import QIntValidator, QIcon
+from PyQt5.QtWidgets import QListWidgetItem
 from PIL import Image
-import os, tempfile
+import os, tempfile, hashlib
 
 class TARWindow(QtWidgets.QDialog):
     def __init__(self, resource):
@@ -13,10 +14,30 @@ class TARWindow(QtWidgets.QDialog):
         self.h, self.w = self.resource.size
     
     def refreshdir(self):
+        self.remove_blanks()
         files = os.listdir(self.tmp_dir)
         files.sort()        
-        for i in files:
-            self.resourceView.addItem(i)
+        for filename in files:
+            icon = QIcon(os.path.join(self.tmp_dir, filename))
+            item = QListWidgetItem(icon, None)
+            self.resourceView.addItem(item)
+
+    def hashsum(self, path, hex=True, hash_type=hashlib.md5):
+        hashinst = hash_type()
+        with open(path, 'rb') as f:
+            for chunk in iter(lambda: f.read(hashinst.block_size * 128), b''):
+                hashinst.update(chunk)
+        return hashinst.hexdigest() if hex else hashinst.digest()
+
+    def remove_blanks(self):
+        unique = []
+        for filename in os.listdir(self.tmp_dir):
+            fileplace = os.path.join(self.tmp_dir, filename)
+            filehash = self.hashsum(fileplace)
+            if filehash not in unique: 
+                unique.append(filehash)
+            else:
+                os.remove(fileplace)
 
 class newtmWindow(QtWidgets.QDialog):
     def __init__(self):
@@ -36,17 +57,17 @@ class newtmWindow(QtWidgets.QDialog):
         files = os.listdir(self.directory)
         files.sort()
         for i in files:
-            if (i.lower().endswith('.png') or i.lower().endswith('.bmp')):
+            if (i.lower().endswith('.png') or i.lower().endswith('.bmp') or i.lower().endswith('.jpg')):
                 self.listFiles.addItem(i)
 
     def TARTilemap(self, resource):
         self.tarfile = TARWindow(resource)
-        for i in range(0,self.tarfile.h,self.tileWH):
-            for j in range(0,self.tarfile.w,self.tileWH):
+        for j in range(0,self.tarfile.w,self.tileWH):
+            for i in range(0,self.tarfile.h,self.tileWH):
                 box = (j,i,j+self.tileWH,i+self.tileWH)
                 try:
                     res = self.tarfile.resource.crop(box)
-                    res.save(self.tarfile.tmp_dir + '/' + str(j) + str(i),"png")
+                    res.save(self.tarfile.tmp_dir + '/' + str(j) + str(i) + ".png","png")
                 except:
                     pass
         self.tarfile.show()
