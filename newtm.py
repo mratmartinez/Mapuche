@@ -2,16 +2,16 @@ from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QSize
 from PyQt5.QtGui import QIntValidator, QIcon
 from PyQt5.QtWidgets import QListWidgetItem
-from PIL import Image
-import os, tempfile, hashlib
+import os, tempfile, hashlib, cv2
 
 class TARWindow(QtWidgets.QDialog):
     def __init__(self, resource):
         super(TARWindow,self).__init__()
         uic.loadUi('UI/tartm.ui', self)
         self.tmp_dir = tempfile.mkdtemp()
-        self.resource = Image.open(resource)
-        self.h, self.w = self.resource.size
+        self.resource = cv2.imread(resource)
+        self.h, self.w, self.channels = self.resource.shape
+        del(self.channels)
     
     def refreshdir(self):
         self.remove_blanks()
@@ -62,14 +62,19 @@ class newtmWindow(QtWidgets.QDialog):
 
     def TARTilemap(self, resource):
         self.tarfile = TARWindow(resource)
-        for j in range(0,self.tarfile.w,self.tileWH):
-            for i in range(0,self.tarfile.h,self.tileWH):
-                box = (j,i,j+self.tileWH,i+self.tileWH)
+        a = 0
+        for i in range(0,self.tarfile.h,self.tileWH):
+            b = 0
+            for j in range(0,self.tarfile.w,self.tileWH):
+                box = self.tarfile.resource[i:i+self.tileWH,j:j+self.tileWH]
                 try:
-                    res = self.tarfile.resource.crop(box)
-                    res.save(self.tarfile.tmp_dir + '/' + str(j) + str(i) + ".png","png")
+                    name = str(a) + '-' + str(b) + '.png'
+                    place = os.path.join(self.tarfile.tmp_dir, name)
+                    cv2.imwrite(place, box)
                 except:
-                    pass
+                    print("Nismanea3")
+                b += 1
+            a += 1
         self.tarfile.show()
         self.tarfile.resourceView.setIconSize(QSize(self.tileWH,self.tileWH))
         self.tarfile.refreshdir()
