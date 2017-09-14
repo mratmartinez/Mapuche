@@ -62,7 +62,7 @@
        <number>10</number>
       </property>
       <item>
-       <widget class="QPushButton" name="newMapbtn">
+       <widget class="QPushButton" name="newMapBtn">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -78,28 +78,28 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="opnMapbtn">
+       <widget class="QPushButton" name="openMapBtn">
         <property name="text">
          <string>Open Map</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="newTlmbtn">
+       <widget class="QPushButton" name="newTmBtn">
         <property name="text">
          <string>New Tilemap</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="loadTlmbtn">
+       <widget class="QPushButton" name="loadTmBtn">
         <property name="text">
          <string>Load Tilemap</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="mapPropbtn">
+       <widget class="QPushButton" name="mapPropBtn">
         <property name="text">
          <string>Map Properties</string>
         </property>
@@ -119,7 +119,7 @@
        <number>5</number>
       </property>
       <item>
-       <widget class="QRadioButton" name="layZero">
+       <widget class="QRadioButton" name="layer0Radio">
         <property name="text">
          <string>Layer 0</string>
         </property>
@@ -129,28 +129,28 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="layOne">
+       <widget class="QRadioButton" name="layer1Radio">
         <property name="text">
          <string>Layer 1</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="layTwo">
+       <widget class="QRadioButton" name="layer2Radio">
         <property name="text">
          <string>Layer 2</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="layThree">
+       <widget class="QRadioButton" name="layer3Radio">
         <property name="text">
          <string>Layer 3</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="layFour">
+       <widget class="QRadioButton" name="layer4Radio">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -160,7 +160,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="layEvnt">
+       <widget class="QRadioButton" name="layerEventRadio">
         <property name="text">
          <string>Event Layer</string>
         </property>
@@ -180,14 +180,14 @@
        <number>10</number>
       </property>
       <item>
-       <widget class="QPushButton" name="fillbtn">
+       <widget class="QPushButton" name="fillBtn">
         <property name="text">
          <string>Fill</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="defEventBtn">
         <property name="text">
          <string>Define Event</string>
         </property>

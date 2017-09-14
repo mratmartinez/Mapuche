@@ -1,38 +1,56 @@
 #!/usr/bin/python3
-from PyQt5 import QtWidgets, uic
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
-from Pytes import pytes
-import newMap, newtm
+
+import os
 import sys
 
-class MainWindow(QtWidgets.QDialog):
+from PyQt5 import uic
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QApplication, QFileDialog, QDialog
+
+import newTm
+import newMap
+from Pytes import pytes
+
+GUI_FOLDER = './UI/'  # Where the .ui files are saved
+
+
+class MainWindow(QDialog):
     def __init__(self):
-        super(MainWindow,self).__init__()
-        uic.loadUi('UI/Main.ui', self)
-        self.layFour.setDisabled(True)
-        self.mapPropbtn.setDisabled(True)
-        self.newMp = newMap.newMapWindow()
-        self.newTm = newtm.newtmWindow()
-        self.opnMapbtn.clicked.connect(self.openMap)
-        self.newMapbtn.clicked.connect(self.newMap)
-        self.newTlmbtn.clicked.connect(self.newtilemap)
+        # We need this to load the GUI
+        super(MainWindow, self).__init__()
+        uic.loadUi(GUI_FOLDER + 'main.ui', self)
+        # Disabled widgets
+        self.mapPropBtn.setDisabled(True)
+        self.layer4Radio.setDisabled(True)
+        # Defining the other windows
+        self.newMapInstance = newMap.newMapWindow()
+        self.newTmInstance = newTm.newTilemapWindow()
+        # Connect signals with slots
+        self.openMapBtn.clicked.connect(self.openMap)
+        self.newMapBtn.clicked.connect(self.newMapSpawn)
+        self.newTmBtn.clicked.connect(self.newTmSpawn)
 
     @pyqtSlot()
     def openMap(self):
-        self.mapfile = QtWidgets.QFileDialog(self).getOpenFileName(self, 'Open file',"","Mapache v1 Maps (*.ma1)")
-        print(self.mapfile)
+        self.mapfile = QFileDialog(self).getOpenFileName(self,
+                                            # Under-indented on purpose
+                                            'Open File', '',
+                                            'Mapache v1 Maps (*.ma1)')
 
-    def newMap(self):
-        self.newMp.show()
+    def newMapSpawn(self):
+        self.newMapInstance.show()
 
-    def newtilemap(self):
-        self.newTm.show()
+    def newTmSpawn(self):
+        self.newTmInstance.show()
 
+
+# main function
 def main():
-    app = QtWidgets.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()

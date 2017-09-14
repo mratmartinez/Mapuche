@@ -48,14 +48,14 @@
      <number>3</number>
     </property>
     <item>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="formatLabel">
       <property name="text">
-       <string>Format:</string>
+       <string>label</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QListWidget" name="listWidget">
+     <widget class="QListWidget" name="formatListWidget">
       <property name="editTriggers">
        <set>QAbstractItemView::SelectedClicked</set>
       </property>
@@ -83,14 +83,14 @@
      <number>3</number>
     </property>
     <item>
-     <widget class="QLabel" name="label_3">
+     <widget class="QLabel" name="tileNameLabel">
       <property name="text">
-       <string>Name:</string>
+       <string>label</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="nameEdit">
+     <widget class="QLineEdit" name="nameLineEdit">
       <property name="maxLength">
        <number>15</number>
       </property>
@@ -118,14 +118,14 @@
      <number>3</number>
     </property>
     <item>
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="resourcesLabel">
       <property name="text">
-       <string>Tiles Resources:</string>
+       <string>label</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QListWidget" name="listFiles"/>
+     <widget class="QListWidget" name="resourceListWidget"/>
     </item>
    </layout>
   </widget>
@@ -151,23 +151,16 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="tileSizeLabel">
         <property name="text">
-         <string>Tile Width / Height: (Max. 100)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="tileWHEdit">
-        <property name="maxLength">
-         <number>3</number>
+         <string>label</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QSlider" name="horizontalSlider">
+     <widget class="QSlider" name="tileSizeSlider">
       <property name="minimum">
        <number>10</number>
       </property>
@@ -213,7 +206,7 @@
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
-     <widget class="QPushButton" name="chooseBtn">
+     <widget class="QPushButton" name="chooseButton">
       <property name="text">
        <string>Choose Tilemap Folders</string>
       </property>
