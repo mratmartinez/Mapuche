@@ -5,10 +5,10 @@ import hashlib
 import tempfile
 
 from PyQt5 import uic
-from PyQt5.QtGui import QIntValidator, QIcon
+from PyQt5.QtGui import QIntValidator, QIcon, QPixmap
 from PyQt5.QtWidgets import (
             QListWidgetItem, QDialog, QFileDialog, QMessageBox,
-            QTableWidgetItem)
+            QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem)
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QSize
 
 GUI_FOLDER = './UI/'
@@ -131,6 +131,8 @@ class TARWindow(QDialog):
         self.comprLabel.setText('Compression:')
         c = self.getTiles(self.resource, self.h, self.w, self.tileSize)
         self.refreshdir(c[0], c[1], self.tileSize)
+        # Signals
+        self.blankButton.clicked.connect(self.showCloser)
 
     def getTiles(self, resource, h, w, tileSize):
         r = 0
@@ -170,11 +172,21 @@ class TARWindow(QDialog):
         for column in range(0, c):
             self.resourceView.setColumnWidth(column, size)
             for row in range(0, r):
-                self.resourceView.setRowHeight(row, size)
+                self.resourceView.setRowHeight(row, size-1)
                 filename = str(column) + '-'+ str(row) + '.png'
                 filedir = os.path.join(self.tmp_dir, filename)
                 icon = QIcon(filedir)
-                item = QTableWidgetItem()
-                item.setIcon(icon)
-                self.resourceView.setItem(r, c, item)
+                item = QTableWidgetItem(icon, None)
+                self.resourceView.setItem(row, column, item)
 
+    @pyqtSlot()
+    def setBlank(self):
+        r = str(self.resourceView.currentRow())
+        c = str(self.resourceView.currentColumn())
+        file = c + '-' + r
+        pixmap = QPixmap(os.path.join(self.tmp_dir, file + '.png'))
+        pixmapitem = QGraphicsPixmapItem(pixmap)
+        scene = QGraphicsScene()
+        scene.addItem(pixmapitem)
+        self.tileView.setScene(scene)
+        self.blankTile = file 
