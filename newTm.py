@@ -7,7 +7,8 @@ import tempfile
 from PyQt5 import uic
 from PyQt5.QtGui import QIntValidator, QIcon
 from PyQt5.QtWidgets import (
-            QListWidgetItem, QDialog, QFileDialog, QMessageBox)
+            QListWidgetItem, QDialog, QFileDialog, QMessageBox,
+            QTableWidgetItem)
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QSize
 
 GUI_FOLDER = './UI/'
@@ -128,20 +129,21 @@ class TARWindow(QDialog):
         self.resourceView.setIconSize(QSize(size, size))
         # Defining labels
         self.comprLabel.setText('Compression:')
-        self.getTiles(self.resource, self.h, self.w, self.tileSize)
-        self.refreshdir()
+        c = self.getTiles(self.resource, self.h, self.w, self.tileSize)
+        self.refreshdir(c[0], c[1], self.tileSize)
 
     def getTiles(self, resource, h, w, tileSize):
-        o = 0
+        r = 0
         for i in range(0, h, tileSize):
-            p = 0
+            c = 0
             for j in range(0, w, tileSize):
                 box = self.resource[i:i+tileSize, j:j+tileSize]
-                nm = str(o) + '-' + str(p) + '.png'
+                nm = str(c) + '-' + str(r) + '.png'
                 place = os.path.join(self.tmp_dir, nm)
                 cv2.imwrite(place, box)
-                p += 1
-            o += 1
+                c += 1
+            r += 1
+        return(c,r)
 
     def hashsum(self, path, hex=True, hash_type=hashlib.md5):
         hashinst = hash_type()
@@ -161,11 +163,18 @@ class TARWindow(QDialog):
             else:
                 os.remove(fileplace)
 
-    def refreshdir(self):
-        self.removeRepeated()
-        files = os.listdir(self.tmp_dir)
-        files.sort()
-        for filename in files:
-            icon = QIcon(os.path.join(self.tmp_dir, filename))
-            item = QListWidgetItem(icon, None)
-            self.resourceView.addItem(item)
+    def refreshdir(self, c, r, size):
+        # self.removeRepeated()
+        self.resourceView.setColumnCount(c)
+        self.resourceView.setRowCount(r)
+        for column in range(0, c):
+            self.resourceView.setColumnWidth(column, size)
+            for row in range(0, r):
+                self.resourceView.setRowHeight(row, size)
+                filename = str(column) + '-'+ str(row) + '.png'
+                filedir = os.path.join(self.tmp_dir, filename)
+                icon = QIcon(filedir)
+                item = QTableWidgetItem()
+                item.setIcon(icon)
+                self.resourceView.setItem(r, c, item)
+
