@@ -1,6 +1,7 @@
 import os
 import sys
 import cv2
+import tarfile
 import hashlib
 import tempfile
 
@@ -130,9 +131,15 @@ class TARWindow(QDialog):
         # Defining labels
         self.comprLabel.setText('Compression:')
         c = self.getTiles(self.resource, self.h, self.w, self.tileSize)
-        self.refreshdir(c[0], c[1], self.tileSize)
+        self.columns, self.rows = c
+        self.refreshdir(self.columns, self.rows, self.tileSize)
+        # We'll define a compression by default
+        self.targzRadio.setChecked(True)
+        # If we don't define blankTile right now it will return an error
+        self.blankTile = str()
         # Signals
-        self.blankButton.clicked.connect(self.showCloser)
+        self.blankButton.clicked.connect(self.setBlank)
+        self.saveBox.accepted.connect(self.saveTilemap)
 
     def getTiles(self, resource, h, w, tileSize):
         r = 0
@@ -190,3 +197,25 @@ class TARWindow(QDialog):
         scene.addItem(pixmapitem)
         self.tileView.setScene(scene)
         self.blankTile = file 
+
+    def saveTilemap(self):
+        # We have to define c and r from self
+        # Because PyQt Signals are shitty on this version
+        # And they changed that but I didn't knew
+        # So I'm using a singals style that can't pass arguments
+        # And I'm too lazy to redo that now so fuck it
+        c = self.columns
+        r = self.rows
+        # We'll write the metadata
+        fileplace = os.path.join(self.tmp_dir, 'metafile.ini')
+        # You may be thinking:
+        # "Why did you write this string on such a shitty way?"
+        # And the answer is: "NONE OF YOUR FUCKING BUSINESS
+        METADATA = (
+                    "[META]\n"
+                    "COLUMNS = {0}\n"
+                    "ROWS = {1}\n"
+                    "BLANKTILE = '{2}'\n"
+                    ).format(c, r, self.blankTile)
+        with open(fileplace, 'w') as metafile:
+            metafile.write(METADATA)
