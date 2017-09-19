@@ -181,7 +181,7 @@ class TARWindow(QDialog):
         for column in range(0, c):
             self.resourceView.setColumnWidth(column, size)
             for row in range(0, r):
-                self.resourceView.setRowHeight(row, size-1)
+                self.resourceView.setRowHeight(row, size)
                 filename = str(column) + '-'+ str(row) + '.png'
                 filedir = os.path.join(self.tmp_dir, filename)
                 icon = QIcon(filedir)
@@ -218,7 +218,8 @@ class TARWindow(QDialog):
                     "COLUMNS = {0}\n"
                     "ROWS = {1}\n"
                     "BLANKTILE = '{2}'\n"
-                    ).format(c, r, self.blankTile)
+                    "TILESIZE = {3}\n"
+                    ).format(c, r, self.blankTile, self.tileSize)
         with open(fileplace, 'w') as metafile:
             metafile.write(METADATA)
         filters = 'TAR (*.tar);;TAR + GZip (*.tar.gz);;\
