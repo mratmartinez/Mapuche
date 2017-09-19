@@ -111,6 +111,7 @@ class newTilemapWindow(QDialog):
             tileSize = self.tileSizeSlider.value()
             self.instance = method().show(selectedResource, tileSize)
             self.instance.show()
+            self.close()
 
     def cancel(self):
         self.close()
@@ -140,6 +141,7 @@ class TARWindow(QDialog):
         # Signals
         self.blankButton.clicked.connect(self.setBlank)
         self.saveBox.accepted.connect(self.saveTilemap)
+        self.saveBox.rejected.connect(self.cancel)
 
     def getTiles(self, resource, h, w, tileSize):
         r = 0
@@ -219,3 +221,19 @@ class TARWindow(QDialog):
                     ).format(c, r, self.blankTile)
         with open(fileplace, 'w') as metafile:
             metafile.write(METADATA)
+        filters = 'TAR (*.tar);;TAR + GZip (*.tar.gz);;\
+                    TAR + BZip2 (*.tar.bz2);; TAR + LZMA (*.tar.xz)'
+        formats = {'TAR (*.tar)': ('.tar', 'w'),
+                    'TAR + GZip (*.tar.gz)': ('.tar.gz', 'w:gz'),
+                    'TAR + BZip2 (*.tar.bz2)': ('.tar.bz2', 'w:bz2'),
+                    'TAR + LZMA (*.tar.xz)': ('.tar.xz', 'w:xz')
+                    }
+        savefile = QFileDialog().getSaveFileName(filter = filters)
+        format = formats[savefile[1]]
+        with tarfile.open(savefile[0] + format[0], format[1]) as tar:
+            for i in os.listdir(self.tmp_dir):
+                tar.add(os.path.join(self.tmp_dir, i), arcname = i)
+        self.close()
+
+    def cancel(self):
+        self.close()
