@@ -29,24 +29,19 @@ class mapEditorWindow(QDialog):
         # A Tool Button for loading tilemaps and stuff
         self.toolButton.setPopupMode(2)
         menu = QMenu()
-        actions = ['Load Tilemap']
+        actions = ['Load Tilemap', 'Triggers']
         for i in actions:
             menu.addAction(i)
         del(actions)
         menuActions = menu.actions()
         self.loadTmAction = menuActions[0]
+        self.triggersAction = menuActions[1]
         self.toolButton.setMenu(menu)
         self.toolButton.setArrowType(Qt.DownArrow)
         # Signals
         self.loadTmAction.triggered.connect(self.pickTilemap)
+        self.triggersAction.triggered.connect(self.triggerEditor)
 
-    @pyqtSlot()
-    def pickTilemap(self):
-        filters = 'TAR (*.tar);;TAR + GZip (*.tar.gz);;\
-                 TAR + BZip2 (*.tar.bz2);; TAR + LZMA (*.tar.xz)'
-        mapfile = QFileDialog().getOpenFileName(filter = filters)
-        if mapfile != '':
-            self.untar(mapfile[0])
 
     def untar(self, mapfile):
         tmp_dir = tempfile.mkdtemp()
@@ -75,4 +70,16 @@ class mapEditorWindow(QDialog):
                 filedir = os.path.join(self.tmp_dir, filename)
                 icon = QIcon(filedir)
                 item = QTableWidgetItem(icon, None)
-                self.tileMapViewer.setItem(row, column, item)
+
+
+    @pyqtSlot()
+    def pickTilemap(self):
+        filters = 'TAR (*.tar);;TAR + GZip (*.tar.gz);;\
+                 TAR + BZip2 (*.tar.bz2);; TAR + LZMA (*.tar.xz)'
+        mapfile = QFileDialog().getOpenFileName(filter = filters)
+        if mapfile != '':
+            self.untar(mapfile[0])
+               self.tileMapViewer.setItem(row, column, item)
+
+    def triggerEditor(self):
+        pass
