@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QApplication, QFileDialog, QDialog
 
 import newTm
 import newMap
+import mapEditor
 from Pytes import pytes
 
 GUI_FOLDER = './UI/'  # Where the .ui files are saved
@@ -25,10 +26,12 @@ class MainWindow(QDialog):
         # Defining the other windows
         self.newMapInstance = newMap.newMapWindow()
         self.newTmInstance = newTm.newTilemapWindow()
+        self.mapEditorInstance = mapEditor.mapEditorWindow()
         # Connect signals with slots
         self.openMapBtn.clicked.connect(self.openMap)
         self.newMapBtn.clicked.connect(self.newMapSpawn)
         self.newTmBtn.clicked.connect(self.newTmSpawn)
+        self.loadTmBtn.clicked.connect(self.mapEditorSpawn)
 
     @pyqtSlot()
     def openMap(self):
@@ -42,6 +45,9 @@ class MainWindow(QDialog):
 
     def newTmSpawn(self):
         self.newTmInstance.show()
+
+    def mapEditorSpawn(self):
+        self.mapEditorInstance.show()
 
 
 # main function
