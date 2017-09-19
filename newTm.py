@@ -233,6 +233,8 @@ class TARWindow(QDialog):
         with tarfile.open(savefile[0] + format[0], format[1]) as tar:
             for i in os.listdir(self.tmp_dir):
                 tar.add(os.path.join(self.tmp_dir, i), arcname = i)
+                os.remove(os.path.join(self.tmp_dir, i))
+        os.removedirs(self.tmp_dir)
         self.close()
 
     def cancel(self):
