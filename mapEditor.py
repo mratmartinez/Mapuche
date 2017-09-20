@@ -9,7 +9,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, Qt, QSize
 from PyQt5.QtWidgets import (QDialog, QMessageBox, 
                             QFileDialog, QMenu, QAction,
-                            QTableWidgetItem)
+                            QTableWidgetItem, QPushButton)
 
 GUI_FOLDER = './UI/'
 
@@ -93,10 +93,13 @@ class triggerEditorWindow(QDialog):
         uic.loadUi(os.path.join(GUI_FOLDER, 'triggerEditor.ui'), self)
         # We need to define this because it won't work if we do it later
         self.addTriggerInstance = addTriggerWindow()
-        # It shouldn't work without an item selected
-        self.delTriggerButton.setDisabled(True)
         # We should define the table properly
         self.triggerTableWidget.setColumnCount(1)
+        # Default Trigger
+        defTrig = QTableWidgetItem('blocked')
+        self.saveTrigger(defTrig)
+        # It shouldn't work without an item selected
+        self.delTriggerButton.setDisabled(True)
         # This should work somehow
         self.newTriggerButton.clicked.connect(self.addTrigger)
         self.delTriggerButton.clicked.connect(self.delTrigger)
@@ -118,14 +121,17 @@ class triggerEditorWindow(QDialog):
         if(self.triggerTableWidget.rowCount()) == 0:
             self.delTriggerButton.setDisabled(True)
 
-    def saveTrigger(self):
+    def saveTrigger(self, argItem):
         count = self.triggerTableWidget.rowCount()
         self.triggerTableWidget.setRowCount(count + 1)
-        trigger = self.addTriggerInstance.lineEdit.text()
-        item = QTableWidgetItem(trigger)
+        if type(argItem) != QPushButton:
+            item = argItem
+        else:
+            trigger = self.addTriggerInstance.lineEdit.text()
+            item = QTableWidgetItem(trigger)
+            self.addTriggerInstance.close()
         self.triggerTableWidget.setItem(count, 0, item) 
         self.triggerTableWidget.resizeColumnsToContents()
-        self.addTriggerInstance.close()
 
 class addTriggerWindow(QDialog):
     def __init__(self):
