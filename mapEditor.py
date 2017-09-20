@@ -79,7 +79,56 @@ class mapEditorWindow(QDialog):
         mapfile = QFileDialog().getOpenFileName(filter = filters)
         if mapfile != '':
             self.untar(mapfile[0])
-               self.tileMapViewer.setItem(row, column, item)
+            self.tileMapViewer.setItem(row, column, item)
 
     def triggerEditor(self):
-        pass
+        self.triggerEditorInstance = triggerEditorWindow()
+        self.triggerEditorInstance.show()
+
+
+class triggerEditorWindow(QDialog):
+    def __init__(self):
+        # We need this to load the GUI
+        super(triggerEditorWindow, self).__init__()
+        uic.loadUi(os.path.join(GUI_FOLDER, 'triggerEditor.ui'), self)
+        # We need to define this because it won't work if we do it later
+        self.addTriggerInstance = addTriggerWindow()
+        # It shouldn't work without an item selected
+        self.delTriggerButton.setDisabled(True)
+        # We should define the table properly
+        self.triggerTableWidget.setColumnCount(1)
+        # This should work somehow
+        self.newTriggerButton.clicked.connect(self.addTrigger)
+        self.delTriggerButton.clicked.connect(self.delTrigger)
+        self.triggerTableWidget.itemSelectionChanged.connect(
+                                                self.activateDeletion)
+        self.addTriggerInstance.buttonBox.clicked.connect(
+                                                self.saveTrigger)
+
+    @pyqtSlot()
+    def activateDeletion(self):
+        self.delTriggerButton.setEnabled(True)
+
+    def addTrigger(self):
+        self.addTriggerInstance.show()
+
+    def delTrigger(self):
+        current = self.triggerTableWidget.currentRow()
+        self.triggerTableWidget.removeRow(current)
+        if(self.triggerTableWidget.rowCount()) == 0:
+            self.delTriggerButton.setDisabled(True)
+
+    def saveTrigger(self):
+        count = self.triggerTableWidget.rowCount()
+        self.triggerTableWidget.setRowCount(count + 1)
+        trigger = self.addTriggerInstance.lineEdit.text()
+        item = QTableWidgetItem(trigger)
+        self.triggerTableWidget.setItem(count, 0, item) 
+        self.triggerTableWidget.resizeColumnsToContents()
+        self.addTriggerInstance.close()
+
+class addTriggerWindow(QDialog):
+    def __init__(self):
+        # We need this to load the GUI
+        super(addTriggerWindow, self).__init__()
+        uic.loadUi(os.path.join(GUI_FOLDER, 'addTrigger.ui'), self)
