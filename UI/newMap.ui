@@ -172,7 +172,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="mapNameLineEdit">
+     <widget class="QLineEdit" name="nameLineEdit">
       <property name="maxLength">
        <number>15</number>
       </property>

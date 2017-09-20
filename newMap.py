@@ -64,18 +64,26 @@ class newMapWindow(QDialog):
 
     @pyqtSlot()
     def saveProject(self):
-        self.pickedFormat = self.formatsList[
-                            self.formatsListWidget.currentItem().text()
-                            ].getformat()
-        self.layer = self.layerSlider.value()
+        # self.pickedFormat = self.formatsList[
+        #                    self.formatsListWidget.currentItem().text()
+        #                    ].getformat()
+        mapSize = self.sizeLineEdit.text()
+        layer = self.layerSlider.value()
         if self.nameLineEdit.text() == '':
             QMessageBox.about(self, 'Error',
                             # Under-indented on purpose
                             "You didn't wrote a name to your project!")
         else:
-            # TODO
-            # I'll have to write the save function here
-            pass
+            filters = 'Mapuche v1 unwritten (*.mu1)'
+            savefile = QFileDialog().getSaveFileName(filter = filters)
+            METADATA = (
+                        "[META]\n"
+                        "SIZE = {0}\n"
+                        "LAYERS = {1}\n"
+                        ).format(mapSize, layer)
+            with open(savefile[0] + '.mu1', 'w') as map:
+                map.write(METADATA)
+            self.close()
 
     def cancel(self):
         self.close()
