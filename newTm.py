@@ -217,7 +217,7 @@ class TARWindow(QDialog):
                     "[META]\n"
                     "COLUMNS = {0}\n"
                     "ROWS = {1}\n"
-                    "BLANKTILE = '{2}'\n"
+                    "BLANKTILE = {2}\n"
                     "TILESIZE = {3}\n"
                     ).format(c, r, self.blankTile, self.tileSize)
         with open(fileplace, 'w') as metafile:

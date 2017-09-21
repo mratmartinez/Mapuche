@@ -29,19 +29,21 @@ class mapEditorWindow(QDialog):
         # A Tool Button for loading tilemaps and stuff
         self.toolButton.setPopupMode(2)
         menu = QMenu()
-        actions = ['Load Tilemap', 'Triggers']
+        actions = ['Load Tilemap', 'Load map', 'Triggers']
         for i in actions:
             menu.addAction(i)
         del(actions)
         menuActions = menu.actions()
         self.loadTmAction = menuActions[0]
-        self.triggersAction = menuActions[1]
+        self.loadMapAction = menuActions[1]
+        self.triggersAction = menuActions[2]
         self.toolButton.setMenu(menu)
         self.toolButton.setArrowType(Qt.DownArrow)
+        self.tileMapFlag = False
         # Signals
         self.loadTmAction.triggered.connect(self.pickTilemap)
+        self.loadMapAction.triggered.connect(self.pickMap)
         self.triggersAction.triggered.connect(self.triggerEditor)
-
 
     def untar(self, mapfile):
         tmp_dir = tempfile.mkdtemp()
@@ -60,6 +62,7 @@ class mapEditorWindow(QDialog):
         self.columnLabel.setText('Columns: ' + str(columns))
         self.rowLabel.setText('Rows: ' + str(rows))
         self.tileMapViewer.setIconSize(QSize(self.tileSize, self.tileSize))
+        self.mapFileViewer.setIconSize(QSize(self.tileSize, self.tileSize))
         self.tileMapViewer.setColumnCount(columns)
         self.tileMapViewer.setRowCount(rows)
         for column in range(0, columns):
@@ -70,7 +73,8 @@ class mapEditorWindow(QDialog):
                 filedir = os.path.join(self.tmp_dir, filename)
                 icon = QIcon(filedir)
                 item = QTableWidgetItem(icon, None)
-
+                self.tileMapViewer.setItem(row, column, item)
+        self.tileMapFlag = True
 
     @pyqtSlot()
     def pickTilemap(self):
@@ -79,11 +83,31 @@ class mapEditorWindow(QDialog):
         mapfile = QFileDialog().getOpenFileName(filter = filters)
         if mapfile != '':
             self.untar(mapfile[0])
-            self.tileMapViewer.setItem(row, column, item)
 
     def triggerEditor(self):
         self.triggerEditorInstance = triggerEditorWindow()
         self.triggerEditorInstance.show()
+
+    def pickMap(self):
+        filters = 'Mapuche v1 unwritten (*.mu1);;\
+                    Mapuche v1 (*.ma1)'
+        mapfile = QFileDialog().getOpenFileName(filter = filters)
+        if (mapfile[0] != '') & self.tileMapFlag:
+            config = configparser.ConfigParser()
+            config.read(os.path.join(self.tmp_dir, mapfile[0]))
+            self.mapSize = int(config['META']['SIZE'])
+            self.layers = int(config['META']['LAYERS'])
+            self.mapFileViewer.setColumnCount(self.mapSize)
+            self.mapFileViewer.setRowCount(self.mapSize)
+            for c in range(0, self.mapSize):
+                self.mapFileViewer.setColumnWidth(c, self.tileSize)
+                for r in range(0, self.mapSize):
+                    self.mapFileViewer.setRowHeight(r, self.tileSize)
+                    filename = self.blankTile + '.png'
+                    filedir = os.path.join(self.tmp_dir, filename)
+                    icon = QIcon(filedir)
+                    item = QTableWidgetItem(icon, None)
+                    self.mapFileViewer.setItem(r, c, item)
 
 
 class triggerEditorWindow(QDialog):
