@@ -9,30 +9,14 @@ from PyQt5 import uic
 from PyQt5.QtGui import QIntValidator, QIcon, QPixmap
 from PyQt5.QtWidgets import (
             QListWidgetItem, QDialog, QFileDialog, QMessageBox,
-            QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem)
+            QTableWidgetItem, QGraphicsScene, QGraphicsPixmapItem,
+            QButtonGroup)
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QSize
 
 GUI_FOLDER = './UI/'
 MIN_TILE_SIZE = 16
 MAX_TILE_SIZE = 128
 DEFAULT_TILE_SIZE = 32
-
-
-# First, we'll define the properties
-class TAR():
-    def __init__(self):
-        self._format = 'TAR'
-        self._extension = '.tar'
-
-    def show(self, resource, tileSize):
-        return(TARWindow(resource, tileSize))
-
-    @property
-    def getformat(self):
-        return(self._format)
-
-    def getextenstion(self):
-        return(self._extension)
 
 
 class newTilemapWindow(QDialog):
@@ -54,9 +38,9 @@ class newTilemapWindow(QDialog):
         # Accepted resource formats
         self.resourceSuffix = ('.png', '.bmp', '.jpg')
         # Now we should define the available formats
-        self.formatList = {
-                            'TAR Tilemap': 'TAR'
-                            }
+        self.formatList = [
+                            'TAR Tilemap'
+                            ]
         # And add the formats into the widget
         for f in list(self.formatList):
             item = QListWidgetItem(f)
@@ -70,8 +54,8 @@ class newTilemapWindow(QDialog):
         self.saveBox.rejected.connect(self.cancel)
 
     # This method load the items in the resourceListWidget.
-    def refreshdir(self, d):
-        files = os.listdir(d)
+    def refreshdir(self, dir):
+        files = os.listdir(dir)
         for i in files:
             for j in self.resourceSuffix:
                 if i.lower().endswith(j):
@@ -79,7 +63,7 @@ class newTilemapWindow(QDialog):
                     self.resourceListWidget.addItem(item)
             if i == files[0]:
                 self.resourceListWidget.setCurrentItem(item)
-        self.directory = d
+        self.directory = dir
 
     @pyqtSlot()
     def pickFolder(self):
@@ -102,14 +86,14 @@ class newTilemapWindow(QDialog):
                     # Under-indented on purpose
                     "You didn't selected a resource for your tilemap!")
         else:
-            d = self.formatListWidget.currentItem().text()
-            method = getattr(sys.modules[__name__], self.formatList[d])
+            tmType = self.formatListWidget.currentItem().text()
             selectedResource = (str(self.directory)
                         # Under-indented on purpose
                         + '/'
                         + self.resourceListWidget.currentItem().text())
             tileSize = self.tileSizeSlider.value()
-            self.instance = method().show(selectedResource, tileSize)
+            if tmType == self.formatList[0]:
+                self.instance = TARWindow(selectedResource, tileSize)
             self.instance.show()
             self.close()
 
@@ -134,6 +118,12 @@ class TARWindow(QDialog):
         c = self.getTiles(self.resource, self.h, self.w, self.tileSize)
         self.columns, self.rows = c
         self.refreshdir(self.columns, self.rows, self.tileSize)
+        # Radio Buttons in a group
+        self.comprGroup = QButtonGroup()
+        self.comprGroup.addButton(self.tarRadio)
+        self.comprGroup.addButton(self.targzRadio)
+        self.comprGroup.addButton(self.tarbz2Radio)
+        self.comprGroup.addButton(self.tarxzRadio)
         # We'll define a compression by default
         self.targzRadio.setChecked(True)
         # If we don't define blankTile right now it will return an error
@@ -164,18 +154,7 @@ class TARWindow(QDialog):
                 hashinst.update(chunk)
         return(hashinst.hexdigest() if hex else hashinst.digest())
 
-    def removeRepeated(self):
-        unique = []
-        for filename in os.listdir(self.tmp_dir):
-            fileplace = os.path.join(self.tmp_dir, filename)
-            filehash = self.hashsum(fileplace)
-            if filehash not in unique:
-                unique.append(filehash)
-            else:
-                os.remove(fileplace)
-
     def refreshdir(self, c, r, size):
-        # self.removeRepeated()
         self.resourceView.setColumnCount(c)
         self.resourceView.setRowCount(r)
         for column in range(0, c):
@@ -202,10 +181,8 @@ class TARWindow(QDialog):
 
     def saveTilemap(self):
         # We have to define c and r from self
-        # Because PyQt Signals are shitty on this version
-        # And they changed that but I didn't knew
+        # Because PyQt Signals are shitty
         # So I'm using a singals style that can't pass arguments
-        # And I'm too lazy to redo that now so fuck it
         c = self.columns
         r = self.rows
         # We'll write the metadata
@@ -222,16 +199,16 @@ class TARWindow(QDialog):
                     ).format(c, r, self.blankTile, self.tileSize)
         with open(fileplace, 'w') as metafile:
             metafile.write(METADATA)
-        filters = 'TAR (*.tar);;TAR + GZip (*.tar.gz);;\
-                    TAR + BZip2 (*.tar.bz2);; TAR + LZMA (*.tar.xz)'
-        formats = {'TAR (*.tar)': ('.tar', 'w'),
-                    'TAR + GZip (*.tar.gz)': ('.tar.gz', 'w:gz'),
-                    'TAR + BZip2 (*.tar.bz2)': ('.tar.bz2', 'w:bz2'),
-                    'TAR + LZMA (*.tar.xz)': ('.tar.xz', 'w:xz')
-                    }
+        filters = 'TAR (*.tar, *.tar.gz, *.tar.xz, *.tar.bz2)'
+        rawSuffix = self.comprGroup.checkedButton().text()
+        suffix = rawSuffix.split(' ')[1][1:-1]
+        sufParts = suffix.split('.')
         savefile = QFileDialog().getSaveFileName(filter = filters)
-        format = formats[savefile[1]]
-        with tarfile.open(savefile[0] + format[0], format[1]) as tar:
+        if len(sufParts) > 2:
+            openAs = 'w:{0}'.format(sufParts[-1])
+        else:
+            openAs = 'w'
+        with tarfile.open(savefile[0] + suffix, openAs) as tar:
             for i in os.listdir(self.tmp_dir):
                 tar.add(os.path.join(self.tmp_dir, i), arcname = i)
                 os.remove(os.path.join(self.tmp_dir, i))
