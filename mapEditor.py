@@ -26,6 +26,8 @@ class mapEditorWindow(QDialog):
         # Let's also define labels
         self.columnLabel.setText('Columns: -')
         self.rowLabel.setText('Rows: -')
+        # This should take the brush as the default 
+        self.brushRadio.setChecked(True)
         # A Tool Button for loading tilemaps and stuff
         self.toolButton.setPopupMode(2)
         menu = QMenu()
@@ -44,6 +46,7 @@ class mapEditorWindow(QDialog):
         self.loadTmAction.triggered.connect(self.pickTilemap)
         self.loadMapAction.triggered.connect(self.pickMap)
         self.triggersAction.triggered.connect(self.triggerEditor)
+        self.mapFileViewer.itemSelectionChanged.connect(self.paint)
 
     def untar(self, mapfile):
         tmp_dir = tempfile.mkdtemp()
@@ -83,6 +86,20 @@ class mapEditorWindow(QDialog):
         mapfile = QFileDialog().getOpenFileName(filter = filters)
         if mapfile != '':
             self.untar(mapfile[0])
+
+    def setBrush(self):
+        self.tileMapViewer.setSelectionMode(1)
+
+    def paint(self):
+        itemRow = self.tileMapViewer.currentRow()
+        itemColumn = self.tileMapViewer.currentColumn()
+        filename = str(itemColumn) + '-' + str(itemRow)
+        filedir = os.path.join(self.tmp_dir, filename)
+        icon = QIcon(filedir)
+        item = QTableWidgetItem(icon, None)
+        row = self.mapFileViewer.currentRow()
+        column = self.mapFileViewer.currentColumn()
+        self.mapFileViewer.setItem(row, column, item)
 
     def triggerEditor(self):
         self.triggerEditorInstance = triggerEditorWindow()
