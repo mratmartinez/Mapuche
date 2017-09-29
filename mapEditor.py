@@ -7,7 +7,7 @@ import configparser
 from PyQt5 import uic
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, Qt, QSize
-from PyQt5.QtWidgets import (QDialog, QMessageBox, 
+from PyQt5.QtWidgets import (QDialog, QMessageBox,
                             QFileDialog, QMenu, QAction,
                             QTableWidgetItem, QPushButton)
 
@@ -28,10 +28,12 @@ class mapEditorWindow(QDialog):
         self.rowLabel.setText('Rows: -')
         # This should take the brush as the default 
         self.brushRadio.setChecked(True)
+        # I will instance this here because I fucked up
+        self.triggerEditorInstance = triggerEditorWindow()
         # A Tool Button for loading tilemaps and stuff
         self.toolButton.setPopupMode(2)
         menu = QMenu()
-        actions = ['Load Tilemap', 'Load map', 'Triggers']
+        actions = ['Load Tilemap', 'Load map', 'Triggers', 'Save Map']
         for i in actions:
             menu.addAction(i)
         del(actions)
@@ -39,13 +41,16 @@ class mapEditorWindow(QDialog):
         self.loadTmAction = menuActions[0]
         self.loadMapAction = menuActions[1]
         self.triggersAction = menuActions[2]
+        self.saveMap = menuActions[3]
         self.toolButton.setMenu(menu)
         self.toolButton.setArrowType(Qt.DownArrow)
         self.tileMapFlag = False
+        self.mapFileFlag = False
         # Signals
         self.loadTmAction.triggered.connect(self.pickTilemap)
         self.loadMapAction.triggered.connect(self.pickMap)
         self.triggersAction.triggered.connect(self.triggerEditor)
+        self.saveMap.triggered.connect(self.saveMapFile)
         self.mapFileViewer.itemSelectionChanged.connect(self.paint)
 
     def untar(self, mapfile):
@@ -102,7 +107,6 @@ class mapEditorWindow(QDialog):
         self.mapFileViewer.setItem(row, column, item)
 
     def triggerEditor(self):
-        self.triggerEditorInstance = triggerEditorWindow()
         self.triggerEditorInstance.show()
 
     def pickMap(self):
@@ -125,7 +129,32 @@ class mapEditorWindow(QDialog):
                     icon = QIcon(filedir)
                     item = QTableWidgetItem(icon, None)
                     self.mapFileViewer.setItem(r, c, item)
+        self.mapFileFlag = True
+        self.mapFile = mapfile[0]
 
+    def saveMapFile(self):
+        if not self.mapFileFlag:
+            return
+        rows = self.triggerEditorInstance.triggerTableWidget.rowCount()
+        filename = 'map.mv1'
+        directory = self.tmp_dir
+        filedir = os.path.join(directory, filename)
+        triggerDict = dict()
+        for i in range(0, rows):
+            it = self.triggerEditorInstance.triggerTableWidget.item(0,i)
+            triggerDict.update({i: str(it.text())})
+        with open(self.mapFile, 'r') as formatFile:
+            METADATA = formatFile.read() + '\n'
+        METADATA = METADATA + (
+            "[TRIGGERS]\n"
+            "QUANTITY = {0}\n"
+        ).format(len(triggerDict))
+        for i in triggerDict:
+            METADATA = METADATA + (
+                "EVENT" + str(i) + " = " + triggerDict[i] + "\n"
+            )
+        with open(filedir, 'w') as tmpMap:
+            tmpMap.write(METADATA)
 
 class triggerEditorWindow(QDialog):
     def __init__(self):
@@ -148,6 +177,7 @@ class triggerEditorWindow(QDialog):
                                                 self.activateDeletion)
         self.addTriggerInstance.buttonBox.clicked.connect(
                                                 self.saveTrigger)
+        self.buttonBox.accepted.connect(self.saveProgress)
 
     @pyqtSlot()
     def activateDeletion(self):
@@ -171,8 +201,11 @@ class triggerEditorWindow(QDialog):
             trigger = self.addTriggerInstance.lineEdit.text()
             item = QTableWidgetItem(trigger)
             self.addTriggerInstance.close()
-        self.triggerTableWidget.setItem(count, 0, item) 
+        self.triggerTableWidget.setItem(count, 0, item)
         self.triggerTableWidget.resizeColumnsToContents()
+
+    def saveProgress(self):
+        self.hide()
 
 class addTriggerWindow(QDialog):
     def __init__(self):
