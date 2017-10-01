@@ -1,5 +1,6 @@
 import os
 import sys
+import struct
 import tarfile
 import tempfile
 import configparser
@@ -33,7 +34,8 @@ class mapEditorWindow(QDialog):
         # A Tool Button for loading tilemaps and stuff
         self.toolButton.setPopupMode(2)
         menu = QMenu()
-        actions = ['Load Tilemap', 'Load map', 'Triggers', 'Save Map']
+        actions = ['Load Tilemap', 'Load map', 'Triggers', 'Save Map',
+                  'Load Old Map']
         for i in actions:
             menu.addAction(i)
         del(actions)
@@ -42,6 +44,7 @@ class mapEditorWindow(QDialog):
         self.loadMapAction = menuActions[1]
         self.triggersAction = menuActions[2]
         self.saveMap = menuActions[3]
+        self.pickOldMapAction = menuActions[4]
         self.toolButton.setMenu(menu)
         self.toolButton.setArrowType(Qt.DownArrow)
         self.tileMapFlag = False
@@ -51,6 +54,7 @@ class mapEditorWindow(QDialog):
         self.loadMapAction.triggered.connect(self.pickMap)
         self.triggersAction.triggered.connect(self.triggerEditor)
         self.saveMap.triggered.connect(self.saveMapFile)
+        self.pickOldMapAction.triggered.connect(self.pickOldMap)
         self.mapFileViewer.itemSelectionChanged.connect(self.paint)
 
     def untar(self, mapfile):
@@ -83,6 +87,8 @@ class mapEditorWindow(QDialog):
                 item = QTableWidgetItem(icon, None)
                 self.tileMapViewer.setItem(row, column, item)
         self.tileMapFlag = True
+        selected = self.blankTile.split('-')
+        self.tileMapViewer.setCurrentCell(int(selected[1]), int(selected[0]))
 
     @pyqtSlot()
     def pickTilemap(self):
@@ -105,13 +111,14 @@ class mapEditorWindow(QDialog):
         row = self.mapFileViewer.currentRow()
         column = self.mapFileViewer.currentColumn()
         self.mapFileViewer.setItem(row, column, item)
+        self.currentMap[column][row] = filename
 
     def triggerEditor(self):
         self.triggerEditorInstance.show()
 
     def pickMap(self):
         filters = 'Mapuche v1 unwritten (*.mu1);;\
-                    Mapuche v1 (*.ma1)'
+                    Mapuche v1 (*.mv1)'
         mapfile = QFileDialog().getOpenFileName(filter = filters)
         if (mapfile[0] != '') & self.tileMapFlag:
             config = configparser.ConfigParser()
@@ -120,17 +127,58 @@ class mapEditorWindow(QDialog):
             self.layers = int(config['META']['LAYERS'])
             self.mapFileViewer.setColumnCount(self.mapSize)
             self.mapFileViewer.setRowCount(self.mapSize)
+            self.currentMap = list()
             for c in range(0, self.mapSize):
+                self.currentMap.append(list())
                 self.mapFileViewer.setColumnWidth(c, self.tileSize)
                 for r in range(0, self.mapSize):
+                    self.currentMap[c].append(self.blankTile)
                     self.mapFileViewer.setRowHeight(r, self.tileSize)
-                    filename = self.blankTile + '.png'
+                    filename = self.blankTile # + '.png'
                     filedir = os.path.join(self.tmp_dir, filename)
                     icon = QIcon(filedir)
                     item = QTableWidgetItem(icon, None)
                     self.mapFileViewer.setItem(r, c, item)
-        self.mapFileFlag = True
-        self.mapFile = mapfile[0]
+            self.mapFileFlag = True
+            self.mapFile = mapfile[0]
+
+    def pickOldMap(self):
+        filters = 'Mapuche v1 unwritten (*.mu1);;\
+                    Mapuche v1 (*.mv1)'
+        mapfile = QFileDialog().getOpenFileName(filter = filters)
+        if (mapfile[0] != '') & self.tileMapFlag:
+            config = configparser.ConfigParser()
+            try:
+                config.read(os.path.join(self.tmp_dir, mapfile[0]),
+                            'unicode_escape')
+            except configparser.ParsingError:
+                    pass
+            self.mapSize = int(config['META']['SIZE'])
+            self.layers = int(config['META']['LAYERS'])
+            triggerQ = int(config['TRIGGERS']['QUANTITY'])
+            # TODO Load triggers
+            self.mapFileViewer.setColumnCount(self.mapSize)
+            self.mapFileViewer.setRowCount(self.mapSize)
+            self.currentMap = list()
+            with open(mapfile[0], 'rb') as loadedMap:
+                for i in range(0, 8 + triggerQ):
+                    loadedMap.readline()
+                for c in range(0, self.mapSize):
+                    self.currentMap.append(list())
+                    self.mapFileViewer.setColumnWidth(c, self.tileSize)
+                    for r in range(0, self.mapSize):
+                        col, row = struct.unpack('BB',
+                                                 loadedMap.read1(2))
+                        tile = str(row) + '-' + str(col)
+                        self.currentMap[c].append(tile)
+                        self.mapFileViewer.setRowHeight(r, self.tileSize)
+                        filename = tile # + '.png'
+                        filedir = os.path.join(self.tmp_dir, filename)
+                        icon = QIcon(filedir)
+                        item = QTableWidgetItem(icon, None)
+                        self.mapFileViewer.setItem(r, c, item)
+            self.mapFileFlag = True
+            self.mapFile = mapfile[0]
 
     def saveMapFile(self):
         if not self.mapFileFlag:
@@ -153,8 +201,18 @@ class mapEditorWindow(QDialog):
             METADATA = METADATA + (
                 "EVENT" + str(i) + " = " + triggerDict[i] + "\n"
             )
+        # Without this, ConfigParser will take the binary part too
+        METADATA += "[END]\n\n"
         with open(filedir, 'w') as tmpMap:
             tmpMap.write(METADATA)
+        with open(filedir, 'ab') as tmpMap:
+            for c in range(0, self.mapSize):
+                for r in range(0, self.mapSize):
+                    row, col = self.currentMap[c][r].split('-')
+                    bcol = struct.pack('B', int(col))
+                    brow = struct.pack('B', int(row))
+                    tmpMap.write(bcol)
+                    tmpMap.write(brow)
 
 class triggerEditorWindow(QDialog):
     def __init__(self):

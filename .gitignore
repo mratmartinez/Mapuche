@@ -89,4 +89,4 @@ ENV/
 .ropeproject
 
 # I hate when this happens on Vim
-.swp
+*.swp
