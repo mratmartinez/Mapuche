@@ -57,6 +57,12 @@ class mapEditorWindow(QDialog):
         self.pickOldMapAction.triggered.connect(self.pickOldMap)
         self.mapFileViewer.itemSelectionChanged.connect(self.paint)
 
+    def closeEvent(self, event):
+        for i in os.listdir(self.tmp_dir):
+            os.remove(os.path.join(self.tmp_dir, i))
+        os.removedirs(self.tmp_dir)
+        event.accept()
+
     def untar(self, mapfile):
         tmp_dir = tempfile.mkdtemp()
         tar = tarfile.open(mapfile)
