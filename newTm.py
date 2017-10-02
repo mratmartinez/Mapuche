@@ -134,6 +134,7 @@ class TARWindow(QDialog):
         self.saveBox.rejected.connect(self.cancel)
 
     def getTiles(self, resource, h, w, tileSize):
+        # This cuts the resource and put it on the temporary folder.
         r = 0
         for i in range(0, h, tileSize):
             c = 0
@@ -147,6 +148,8 @@ class TARWindow(QDialog):
         return(c,r)
 
     def hashsum(self, path, hex=True, hash_type=hashlib.md5):
+        # All this function was for deleting the repeated tiles. I won't use
+        # it.
         hashinst = hash_type()
         blocksize = hashinst.block_size * 128
         with open(path, 'rb') as f:
@@ -155,6 +158,7 @@ class TARWindow(QDialog):
         return(hashinst.hexdigest() if hex else hashinst.digest())
 
     def refreshdir(self, c, r, size):
+        # This loads the tilemap
         self.resourceView.setColumnCount(c)
         self.resourceView.setRowCount(r)
         for column in range(0, c):
@@ -169,6 +173,8 @@ class TARWindow(QDialog):
 
     @pyqtSlot()
     def setBlank(self):
+        # Set the blank tile. When you load a new map, the tilemap will give a
+        # default tile for the blank map.
         r = str(self.resourceView.currentRow())
         c = str(self.resourceView.currentColumn())
         file = c + '-' + r
@@ -177,7 +183,7 @@ class TARWindow(QDialog):
         scene = QGraphicsScene()
         scene.addItem(pixmapitem)
         self.tileView.setScene(scene)
-        self.blankTile = file 
+        self.blankTile = file
 
     def saveTilemap(self):
         # We have to define c and r from self
