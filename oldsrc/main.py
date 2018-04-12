@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import QApplication, QFileDialog, QDialog
 import newTm
 import newMap
 import mapEditor
-from Pytes import pytes
 
 GUI_FOLDER = './UI/'  # Where the .ui files are saved
 

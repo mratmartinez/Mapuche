@@ -7,8 +7,6 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QDialog, QMessageBox
 from PyQt5.QtWidgets import QFileDialog, QListWidgetItem
 
-from Pytes import pytes
-
 GUI_FOLDER = './UI/'
 MAX_TILES = 950
 MIN_TILES = 1
