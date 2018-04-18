@@ -246,7 +246,7 @@ class mapEditorWindow(QDialog):
         # didn't used it in the end.
         triggerDict = dict()
         for i in range(0, rows):
-            it = self.triggerEditorInstance.triggerTableWidget.item(0,i)
+            it = self.triggerEditorInstance.triggerTableWidget.item(i,0)
             triggerDict.update({i: str(it.text())})
         with open(self.mapFile, 'r') as formatFile:
             METADATA = formatFile.read() + '\n'
