@@ -27,15 +27,15 @@
        <property name="rightMargin">
         <number>15</number>
        </property>
-       <item row="1" column="0">
-        <widget class="QListView" name="formatsListView"/>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="formatsListLabel">
          <property name="text">
           <string>formatsList</string>
          </property>
         </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QListWidget" name="formatsListWidget"/>
        </item>
       </layout>
      </item>
