@@ -63,7 +63,7 @@
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QTableWidget" name="tableWidget"/>
+         <widget class="QListWidget" name="tmsListWidget"/>
         </item>
        </layout>
       </widget>
@@ -98,7 +98,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="mapQuantityLineEdit"/>
+           <widget class="QSpinBox" name="mapQuantityInput"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="mapDefSizeLabel">
@@ -108,71 +108,19 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="mapDefSizeLineEdit"/>
+           <widget class="QSpinBox" name="mapDefSizeInput"/>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="globalTriggersLabel">
+           <widget class="QLabel" name="tileSizeLabel">
             <property name="text">
-             <string>globalTriggers</string>
+             <string>tileSize</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="0" colspan="2">
            <widget class="QPushButton" name="triggersBtn">
             <property name="text">
              <string>triggers</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="useGitLabel">
-            <property name="text">
-             <string>useGit</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QCheckBox" name="useGitCheckBox"/>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="selectedFormatLabel">
-            <property name="text">
-             <string>selectedFormat</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QLabel" name="formatLabel">
-            <property name="text">
-             <string>formatLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="tileMapsQuantityLabel">
-            <property name="text">
-             <string>tileMapsQuantity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QLabel" name="tmQuantLabel">
-            <property name="text">
-             <string>tmQuantLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="triggersQuantityLabel">
-            <property name="text">
-             <string>triggersQuantity</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLabel" name="triggersQuantLabel">
-            <property name="text">
-             <string>triggersQuantLabel</string>
             </property>
            </widget>
           </item>
@@ -189,12 +137,43 @@
             </property>
            </spacer>
           </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="tileMapsQuantityLabel">
+            <property name="text">
+             <string>tileMapsQuantity</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLabel" name="tmQuantLabel">
+            <property name="text">
+             <string>tmQuant</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="triggersQuantityLabel">
+            <property name="text">
+             <string>triggersQuantity</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QLabel" name="triggersQuantLabel">
+            <property name="text">
+             <string>triggersQuant</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="tileSizeInput"/>
+          </item>
          </layout>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="destinationBtn">
             <property name="text">
              <string>destination</string>
             </property>
