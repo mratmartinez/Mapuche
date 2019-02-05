@@ -4,13 +4,14 @@ import os
 import sys
 
 import json
+import logging
 
 import cv2
 import tarfile
 import tempfile
 from zipfile import ZipFile
 from PyQt5 import uic
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QRegExp
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QRegExp, QSize
 from PyQt5.QtGui import QRegExpValidator, QIcon
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QListWidgetItem, QButtonGroup,
@@ -21,6 +22,13 @@ from PyQt5.QtWidgets import (
 GUI_FOLDER = '../res/ui/'
 SUPPORTED_FORMATS = ('.bmp', '.jpeg', '.jpg', '.jpe', '.png', '.tiff',
                      '.tif', '.jp2', '.pbm', '.pgm', '.ppm', '.sr', '.ras')
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(funcName)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -89,6 +97,7 @@ class newProjectDialog(QDialog):
     @pyqtSlot()
     def updateTilemapsQuantity(self):
         tilemaps = self.tmsListWidget.count()
+        logger.info(tilemaps)
         self.tmQuantLabel.setText(str(tilemaps))
 
     @pyqtSlot()
@@ -112,6 +121,7 @@ class newProjectDialog(QDialog):
         for i in filelist:
             if i.lower().endswith(SUPPORTED_FORMATS) and self.itemcheck(i):
                 tilelist.append(i)
+        logger.info(tilelist)
         self.tmsListWidget.addItems(tilelist)
         self.updateButtonStatus() # Qt doesn't provide the kind of signal I need for this case.
 
@@ -141,6 +151,7 @@ class newProjectDialog(QDialog):
         tilesize = self.tileSizeInput.value()
         mapquantity = self.mapQuantityInput.value()
         mapsize = self.mapDefSizeInput.value()
+        logger.info((filecount, name, folder, tilesize, mapquantity, mapsize))
         # Preparations
         resfolder = os.path.join(folder, "res")
         mapsfolder = os.path.join(folder, "maps")
@@ -200,6 +211,7 @@ class MapEditor(QMainWindow):
         self.trigBtn.setText("Triggers")
         self.mapListLabel.setText("Maps")
         self.tilemapListLabel.setText("Tilemaps")
+        self.tileMapWidget.setSortingEnabled(False)
         if project:
             self.loadProject(project)
 
@@ -212,19 +224,21 @@ class MapEditor(QMainWindow):
         for i in os.listdir(folder):
             with open(os.path.join(os.path.join(folder, i), "data.json"), "r") as metadata:
                 data = json.load(metadata)
-            for r in range(0, data["rows"]+1):
+                logger.debug(data)
+            for r in range(0, data["rows"]):
                 self.tileMapWidget.setRowHeight(r, data["size"])
-                for c in range(0, data["columns"]+1):
+                for c in range(0, data["columns"]):
                     self.tileMapWidget.setColumnWidth(c, data["size"])
-                    filename = str(r)+'-'+str(c)
+                    filename = str(c)+'-'+str(r)
                     icon = self.createIcon(os.path.join(folder, filename + ".png"))
-            self.tileMapWidget.setColumnCount(c)
+                    tilemaps.append((filename, icon))
             self.tileMapWidget.setRowCount(r)
-            tilemaps.append((filename, icon))
+            self.tileMapWidget.setColumnCount(c)
+        logger.debug(tilemaps)
+        self.tileMapWidget.setIconSize(QSize(data["size"], data["size"]))
         return tilemaps
 
     def createIcon(self, file):
-        print(file)
         icon = QIcon(file)
         item = QTableWidgetItem(icon, None)
         return item
@@ -233,8 +247,8 @@ class MapEditor(QMainWindow):
         tilemaps = self.loadTilemapData(folder)
         for i in tilemaps:
             pos, icon = i
-            r, c = [ int(i) for i in pos.split("-") ]
-            print(r,c,icon)
+            c, r = [ int(i) for i in pos.split("-") ]
+            logger.debug(i)
             self.tileMapWidget.setItem(r, c, icon)
 
 
