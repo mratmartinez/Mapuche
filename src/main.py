@@ -224,18 +224,10 @@ class MapEditor(QMainWindow):
         for i in os.listdir(folder):
             with open(os.path.join(os.path.join(folder, i), "data.json"), "r") as metadata:
                 data = json.load(metadata)
-                logger.debug(data)
-            for r in range(0, data["rows"]):
-                self.tileMapWidget.setRowHeight(r, data["size"])
-                for c in range(0, data["columns"]):
-                    self.tileMapWidget.setColumnWidth(c, data["size"])
-                    filename = str(c)+'-'+str(r)
-                    icon = self.createIcon(os.path.join(folder, filename + ".png"))
-                    tilemaps.append((filename, icon))
-            self.tileMapWidget.setRowCount(r)
-            self.tileMapWidget.setColumnCount(c)
-        logger.debug(tilemaps)
-        self.tileMapWidget.setIconSize(QSize(data["size"], data["size"]))
+            self.tileMapWidget.setRowCount(data["rows"])
+            self.tileMapWidget.setColumnCount(data["columns"])
+            self.tileMapWidget.setIconSize(QSize(data["size"], data["size"]))
+            tilemaps.append(data)
         return tilemaps
 
     def createIcon(self, file):
@@ -245,11 +237,21 @@ class MapEditor(QMainWindow):
 
     def loadTilemaps(self, folder):
         tilemaps = self.loadTilemapData(folder)
-        for i in tilemaps:
-            pos, icon = i
-            c, r = [ int(i) for i in pos.split("-") ]
-            logger.debug(i)
-            self.tileMapWidget.setItem(r, c, icon)
+        for i in range(0, len(tilemaps)):
+            data = tilemaps[i]
+            c = data["columns"]
+            r = data["rows"]
+            size = data["size"]
+            for column in range(c):
+                self.tileMapWidget.setColumnWidth(column, size)
+                for row in range(r):
+                    self.tileMapWidget.setRowHeight(row, size)
+                    setfolder = os.path.join(folder, str(i))
+                    filename = str(column) + '-' + str(row)
+                    filepath = os.path.join(setfolder, filename + ".png")
+                    logger.debug(filepath)
+                    item = self.createIcon(filepath)
+                    self.tileMapWidget.setItem(row, column, item)
 
 
 def main():
