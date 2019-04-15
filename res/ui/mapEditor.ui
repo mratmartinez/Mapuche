@@ -20,20 +20,20 @@
       <item>
        <widget class="QTableWidget" name="tileMapWidget">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
-          <horstretch>60</horstretch>
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>170</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>200</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -52,10 +52,16 @@
        <widget class="QTableWidget" name="mapWidget">
         <property name="minimumSize">
          <size>
-          <width>448</width>
+          <width>0</width>
           <height>0</height>
          </size>
         </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
        </widget>
       </item>
       <item>
@@ -107,7 +113,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QListView" name="mapList"/>
+         <widget class="QListWidget" name="mapListView"/>
         </item>
         <item>
          <widget class="QLabel" name="tilemapListLabel">
@@ -117,7 +123,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="tilemapList"/>
+         <widget class="QListWidget" name="tilemapListView"/>
         </item>
        </layout>
       </item>

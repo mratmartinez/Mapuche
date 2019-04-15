@@ -195,16 +195,18 @@ class newProjectDialog(QDialog):
 
 
 class MapEditor(QMainWindow):
-    def __init__(self, project=None):
+    def __init__(self, project=None, maplist=[]):
         super(MapEditor, self).__init__()
         uic.loadUi(GUI_FOLDER + 'mapEditor.ui', self)
-        buttonGroup = QButtonGroup()
-        buttonGroup.addButton(self.layer0Btn)
-        buttonGroup.addButton(self.layer1Btn)
-        buttonGroup.addButton(self.layer2Btn)
-        buttonGroup.addButton(self.layer3Btn)
-        buttonGroup.addButton(self.trigBtn)
+        self.buttonGroup = QButtonGroup()
+        self.buttonGroup.addButton(self.layer0Btn)
+        self.buttonGroup.addButton(self.layer1Btn)
+        self.buttonGroup.addButton(self.layer2Btn)
+        self.buttonGroup.addButton(self.layer3Btn)
+        self.buttonGroup.addButton(self.trigBtn)
+        self.buttonGroup.buttonToggled.connect(self.updateLayer) # This signal is placed here on purpose
         self.layer0Btn.setText("Layer 0")
+        self.layer0Btn.setChecked(True)
         self.layer1Btn.setText("Layer 1")
         self.layer2Btn.setText("Layer 2")
         self.layer3Btn.setText("Layer 3")
@@ -212,47 +214,115 @@ class MapEditor(QMainWindow):
         self.mapListLabel.setText("Maps")
         self.tilemapListLabel.setText("Tilemaps")
         self.tileMapWidget.setSortingEnabled(False)
+        self._maplist = maplist
+        logger.info(self.layer)
+        self.resfolder = os.path.join(project, "res")
+        self.mapsfolder = os.path.join(project, "maps")
+        self.mapListView.itemSelectionChanged.connect(self.showMap)
+        self.tilemapListView.itemSelectionChanged.connect(self.showTilemap)
         if project:
-            self.loadProject(project)
+            self.loadProject()
 
-    def loadProject(self, folder):
-        self.loadTilemaps(os.path.join(folder, "res"))
-        # self.loadMaps()
 
-    def loadTilemapData(self, folder):
+    @property
+    def layer(self):
+        logger.info("Returning the layer")
+        return self._layer
+
+    @layer.setter
+    def layer(self, layerBtn):
+        layer = int(layerBtn.text().split(' ')[1])
+        self._layer = "layer"+str(layer)
+
+    @property
+    def maplist(self):
+        logger.info("Returning maplist")
+        return self._maplist
+
+    @maplist.setter
+    def maplist(self, maplist):
+        self._maplist = maplist
+
+    @property
+    def tilemaps(self):
+        return self._tilemaps
+
+    @tilemaps.setter
+    def tilemaps(self, tilemaps):
+        self._tilemaps = tilemaps
+
+    def updateLayer(self):
+        self.layer = self.buttonGroup.checkedButton()
+
+    def loadProject(self):
+        self.loadTilemaps()
+        self.loadMaps()
+
+    def loadMaps(self):
+        maps = list()
+        for i in sorted(os.listdir(self.mapsfolder)):
+            with open(os.path.join(self.mapsfolder, i)) as mapdata:
+                map = json.load(mapdata)
+                maps.append(map)
+        self.populateMapList(maps)
+
+    def populateMapList(self, maplist):
+        for i in range(0, len(maplist)):
+            self.mapListView.addItem(str(i))
+        self.maplist = maplist
+        self.mapListView.setCurrentRow(0)
+
+    def showMap(self):
+        item = self.mapListView.currentRow()
+        map = self.maplist[item]
+        selectedTilemap = int(self.tilemapListView.currentItem().text())
+        mapsize = len(map[self.layer])
+        tilesize = self.tilemaps[selectedTilemap]["size"]
+        logger.info(map)
+        self.mapWidget.setRowCount(mapsize)
+        self.mapWidget.setColumnCount(mapsize)
+        self.mapWidget.setIconSize(QSize(tilesize, tilesize))
+        for i in range(0, mapsize):
+            self.mapWidget.setRowHeight(i, tilesize)
+            self.mapWidget.setColumnWidth(i, tilesize)
+
+    def loadTilemaps(self):
         tilemaps = list()
-        for i in os.listdir(folder):
-            with open(os.path.join(os.path.join(folder, i), "data.json"), "r") as metadata:
+        for i in sorted(os.listdir(self.resfolder)):
+            with open(os.path.join(os.path.join(self.resfolder, i), "data.json"), "r") as metadata:
                 data = json.load(metadata)
-            self.tileMapWidget.setRowCount(data["rows"])
-            self.tileMapWidget.setColumnCount(data["columns"])
             self.tileMapWidget.setIconSize(QSize(data["size"], data["size"]))
             tilemaps.append(data)
-        return tilemaps
+        self.populateTilemapList(tilemaps)
 
     def createIcon(self, file):
         icon = QIcon(file)
         item = QTableWidgetItem(icon, None)
         return item
 
-    def loadTilemaps(self, folder):
-        tilemaps = self.loadTilemapData(folder)
+    def populateTilemapList(self, tilemaps):
         for i in range(0, len(tilemaps)):
-            data = tilemaps[i]
-            c = data["columns"]
-            r = data["rows"]
-            size = data["size"]
-            for column in range(c):
-                self.tileMapWidget.setColumnWidth(column, size)
-                for row in range(r):
-                    self.tileMapWidget.setRowHeight(row, size)
-                    setfolder = os.path.join(folder, str(i))
-                    filename = str(column) + '-' + str(row)
-                    filepath = os.path.join(setfolder, filename + ".png")
-                    logger.debug(filepath)
-                    item = self.createIcon(filepath)
-                    self.tileMapWidget.setItem(row, column, item)
+            self.tilemapListView.addItem(str(i))
+        self.tilemaps = tilemaps
+        self.tilemapListView.setCurrentRow(0)
 
+    def showTilemap(self):
+        selected = int(self.tilemapListView.currentItem().text())
+        data = self.tilemaps[selected]
+        c = data["columns"]
+        r = data["rows"]
+        size = data["size"]
+        self.tileMapWidget.setRowCount(r)
+        self.tileMapWidget.setColumnCount(c)
+        for column in range(c):
+            self.tileMapWidget.setColumnWidth(column, size)
+            for row in range(r):
+                self.tileMapWidget.setRowHeight(row, size)
+                setfolder = os.path.join(self.resfolder, str(selected))
+                filename = str(column) + '-' + str(row)
+                filepath = os.path.join(setfolder, filename + ".png")
+                item = self.createIcon(filepath)
+                self.tileMapWidget.setItem(row, column, item)
 
 def main():
     app = QApplication(sys.argv)
