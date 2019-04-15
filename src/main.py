@@ -4,25 +4,25 @@ import os
 import sys
 
 import json
+import sqlite3
 import logging
 
 import cv2
-import tarfile
-import tempfile
-from zipfile import ZipFile
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QRegExp, QSize
 from PyQt5.QtGui import QRegExpValidator, QIcon
 from PyQt5.QtWidgets import (
     QApplication, QDialog, QMainWindow, QListWidgetItem, QButtonGroup,
-    QFileDialog, QDialogButtonBox, QMessageBox, QTableWidgetItem
+    QFileDialog, QDialogButtonBox, QMessageBox, QTableWidgetItem, QAbstractItemView
 
 )
 
 GUI_FOLDER = '../res/ui/'
+# All these are going to be converted to .png anyway
 SUPPORTED_FORMATS = ('.bmp', '.jpeg', '.jpg', '.jpe', '.png', '.tiff',
                      '.tif', '.jp2', '.pbm', '.pgm', '.ppm', '.sr', '.ras')
 
+# This is so I can log stuff, obviously
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler()
@@ -52,8 +52,10 @@ class MainWindow(QDialog):
 
     def openProject(self):
         directory = QFileDialog().getExistingDirectory()
-        self.mapEditorInstance = MapEditor(directory)
-        self.mapEditorInstance.show()
+        if directory != '':
+            self.mapEditorInstance = MapEditor(directory)
+            self.mapEditorInstance.showMaximized()
+            self.close()
 
 
 class newProjectDialog(QDialog):
@@ -198,31 +200,41 @@ class MapEditor(QMainWindow):
     def __init__(self, project=None, maplist=[]):
         super(MapEditor, self).__init__()
         uic.loadUi(GUI_FOLDER + 'mapEditor.ui', self)
-        self.buttonGroup = QButtonGroup()
-        self.buttonGroup.addButton(self.layer0Btn)
-        self.buttonGroup.addButton(self.layer1Btn)
-        self.buttonGroup.addButton(self.layer2Btn)
-        self.buttonGroup.addButton(self.layer3Btn)
-        self.buttonGroup.addButton(self.trigBtn)
-        self.buttonGroup.buttonToggled.connect(self.updateLayer) # This signal is placed here on purpose
+        self.layerButtonGroup = QButtonGroup()
+        self.layerButtonGroup.addButton(self.layer0Btn)
+        self.layerButtonGroup.addButton(self.layer1Btn)
+        self.layerButtonGroup.addButton(self.layer2Btn)
+        self.layerButtonGroup.addButton(self.layer3Btn)
+        self.layerButtonGroup.addButton(self.trigBtn)
+        self.layerButtonGroup.buttonToggled.connect(self.updateLayer) # This signal is placed here on purpose
+        self.layerLabel.setText("Layers")
         self.layer0Btn.setText("Layer 0")
         self.layer0Btn.setChecked(True)
         self.layer1Btn.setText("Layer 1")
         self.layer2Btn.setText("Layer 2")
         self.layer3Btn.setText("Layer 3")
         self.trigBtn.setText("Triggers")
+        self.paintModeButtonGroup = QButtonGroup()
+        self.paintModeButtonGroup.addButton(self.singleBtn)
+        self.paintModeButtonGroup.addButton(self.squareBtn)
+        self.paintModeLabel.setText("Paint Mode")
+        self.singleBtn.setText("Single")
+        self.squareBtn.setText("Square")
         self.mapListLabel.setText("Maps")
         self.tilemapListLabel.setText("Tilemaps")
         self.tileMapWidget.setSortingEnabled(False)
+        self.tileMapWidget.setSelectionMode(QAbstractItemView.SingleSelection)
         self._maplist = maplist
         logger.info(self.layer)
         self.resfolder = os.path.join(project, "res")
         self.mapsfolder = os.path.join(project, "maps")
         self.mapListView.itemSelectionChanged.connect(self.showMap)
+        self.mapWidget.itemSelectionChanged.connect(self.paintMap)
         self.tilemapListView.itemSelectionChanged.connect(self.showTilemap)
+        self.paintModeButtonGroup.buttonToggled.connect(self.updateBrush)
+        self.singleBtn.setChecked(True)
         if project:
             self.loadProject()
-
 
     @property
     def layer(self):
@@ -252,7 +264,13 @@ class MapEditor(QMainWindow):
         self._tilemaps = tilemaps
 
     def updateLayer(self):
-        self.layer = self.buttonGroup.checkedButton()
+        self.layer = self.layerButtonGroup.checkedButton()
+
+    def updateBrush(self):
+        if self.paintModeButtonGroup.checkedButton().text() == "Single":
+            self.mapWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        else:
+            self.mapWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
 
     def loadProject(self):
         self.loadTilemaps()
@@ -276,7 +294,8 @@ class MapEditor(QMainWindow):
         item = self.mapListView.currentRow()
         map = self.maplist[item]
         selectedTilemap = int(self.tilemapListView.currentItem().text())
-        mapsize = len(map[self.layer])
+        maplayer = map[self.layer]
+        mapsize = len(maplayer)
         tilesize = self.tilemaps[selectedTilemap]["size"]
         logger.info(map)
         self.mapWidget.setRowCount(mapsize)
@@ -285,6 +304,29 @@ class MapEditor(QMainWindow):
         for i in range(0, mapsize):
             self.mapWidget.setRowHeight(i, tilesize)
             self.mapWidget.setColumnWidth(i, tilesize)
+            for j in range(0, mapsize):
+                c, r, tm = maplayer[i][j]
+                item = self.getTile(c, r, tm)
+                self.mapWidget.setItem(i, j, item)
+
+    def paintMap(self):
+        col = self.tileMapWidget.currentColumn()
+        row = self.tileMapWidget.currentRow()
+        tilemap = int(self.tilemapListView.currentItem().text())
+        if self.paintModeButtonGroup.checkedButton().text() == "Single":
+            for i in self.mapWidget.selectedItems():
+                item = self.getTile(col, row, tilemap)
+                self.mapWidget.setItem(i.row(), i.column(), item)
+        else:
+            selectedRange = self.mapWidget.selectedRanges()[0]
+            left = selectedRange.leftColumn()
+            right = selectedRange.rightColumn()
+            top = selectedRange.topRow()
+            bot = selectedRange.bottomRow()
+            for i in range(top, bot+1):
+                for j in range(left, right+1):
+                    item = self.getTile(col, row, tilemap)
+                    self.mapWidget.setItem(i, j, item)
 
     def loadTilemaps(self):
         tilemaps = list()
@@ -318,11 +360,15 @@ class MapEditor(QMainWindow):
             self.tileMapWidget.setColumnWidth(column, size)
             for row in range(r):
                 self.tileMapWidget.setRowHeight(row, size)
-                setfolder = os.path.join(self.resfolder, str(selected))
-                filename = str(column) + '-' + str(row)
-                filepath = os.path.join(setfolder, filename + ".png")
-                item = self.createIcon(filepath)
+                item = self.getTile(column, row, selected)
                 self.tileMapWidget.setItem(row, column, item)
+
+    def getTile(self, column, row, tilemap):
+        setfolder = os.path.join(self.resfolder, str(tilemap))
+        filename = str(column) + '-' + str(row)
+        filepath = os.path.join(setfolder, filename + ".png")
+        item = self.createIcon(filepath)
+        return item
 
 def main():
     app = QApplication(sys.argv)
