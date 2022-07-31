@@ -3,7 +3,7 @@
 import sys
 
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QMenuBar, QMenu
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMenu
 
 class MainWindow(QMainWindow):
     class MenuBar(QMenuBar):
