@@ -2,6 +2,7 @@
 
 import sys
 
+from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import QApplication, QMainWindow, QHBoxLayout, QMenuBar, QMenu
 
 class MainWindow(QMainWindow):
@@ -9,15 +10,43 @@ class MainWindow(QMainWindow):
         class ProjectMenuItem(QMenu):
             def __init__(self):
                 super().__init__()
-                self.setTitle('Project')
-                self.new_button = self.addAction('New')
-                self.exit_button = self.addAction('Exit')
-
-                self.new_button.setDisabled(True)
-                self.exit_button.triggered.connect(self.handle_exit_button_click)
+                self.structure = {
+                    'title': 'Project',
+                    'items': [
+                        {
+                            'name': 'New',
+                            'disabled': True
+                        },
+                        {
+                            'name': 'Exit',
+                            'shortcut': 'Ctrl+Q',
+                            'trigger': self.handle_exit_button_click
+                        }
+                    ]
+                }
 
             def handle_exit_button_click(self):
                 sys.exit()
+
+            @property
+            def structure(self):
+                return self._structure
+
+            @structure.setter
+            def structure(self, structure):
+                self._structure = structure
+                self.setTitle(structure['title'])
+                for item in structure['items']:
+                    item_action = self.addAction(item.get('name'))
+                    if (item.get('checkable')):
+                        item_action.setCheckable(True)
+                    if (item.get('disabled')):
+                        item_action.setDisabled(True)
+                    if (item.get('shortcut')):
+                        item_action.setShortcut(QKeySequence(item['shortcut']))
+                    if (item.get('trigger')):
+                        item_action.triggered.connect(item['trigger'])
+                return
 
         def __init__(self):
             super().__init__()
