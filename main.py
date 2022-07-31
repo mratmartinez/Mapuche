@@ -15,7 +15,8 @@ class MainWindow(QMainWindow):
                     'items': [
                         {
                             'name': 'New',
-                            'disabled': True
+                            'disabled': True,
+                            'shortcut': 'Ctrl+N'
                         },
                         {
                             'name': 'Exit',
@@ -26,7 +27,7 @@ class MainWindow(QMainWindow):
                 }
 
             def handle_exit_button_click(self):
-                sys.exit()
+                sys.exit(0)
 
             @property
             def structure(self):
