@@ -39,14 +39,18 @@ class MainWindow(QMainWindow):
                 self.setTitle(structure['title'])
                 for item in structure['items']:
                     item_action = self.addAction(item.get('name'))
+                    # Booleans
                     if (item.get('checkable')):
                         item_action.setCheckable(True)
                     if (item.get('disabled')):
                         item_action.setDisabled(True)
-                    if (item.get('shortcut')):
-                        item_action.setShortcut(QKeySequence(item['shortcut']))
-                    if (item.get('trigger')):
-                        item_action.triggered.connect(item['trigger'])
+                    # Definitions
+                    shortcut = item.get('shortcut')
+                    if (shortcut):
+                        item_action.setShortcut(QKeySequence(shortcut))
+                    trigger = item.get('trigger')
+                    if (trigger):
+                        item_action.triggered.connect(trigger)
                 return
 
         def __init__(self):
