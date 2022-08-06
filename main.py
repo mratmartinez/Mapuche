@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
 
         def get_menu(self, model):
             try:
-                menu_title = model.get('title')
+                menu_title = model['title']
                 menu = QMenu(menu_title)
                 items = model.get('items')
             except TypeError as err:
@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
             except Exception as err:
                 raise err
             
-            if (type(items) not in [list, tuple]):
+            if (type(items) not in (list, tuple)):
                 return menu
 
             for item in items:
@@ -72,6 +72,7 @@ class MainWindow(QMainWindow):
                             'disabled': True,
                             'shortcut': 'Ctrl+N'
                         },
+                        None,
                         {
                             'name': 'Exit',
                             'shortcut': 'Ctrl+Q',
