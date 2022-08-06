@@ -8,26 +8,9 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMenu
 class MainWindow(QMainWindow):
     class MenuBar(QMenuBar):
         class ProjectMenuItem(QMenu):
-            def __init__(self):
+            def __init__(self, structure):
                 super().__init__()
-                self.structure = {
-                    'title': 'Project',
-                    'items': [
-                        {
-                            'name': 'New',
-                            'disabled': True,
-                            'shortcut': 'Ctrl+N'
-                        },
-                        {
-                            'name': 'Exit',
-                            'shortcut': 'Ctrl+Q',
-                            'trigger': self.handle_exit_button_click
-                        }
-                    ]
-                }
-
-            def handle_exit_button_click(self):
-                sys.exit(0)
+                self.structure = structure
 
             @property
             def structure(self):
@@ -53,8 +36,28 @@ class MainWindow(QMainWindow):
 
         def __init__(self):
             super().__init__()
-            self.bar_items = [self.ProjectMenuItem()]
+            self.structure = {
+                    'title': 'Project',
+                    'items': [
+                        {
+                            'name': 'New',
+                            'disabled': True,
+                            'shortcut': 'Ctrl+N'
+                        },
+                        {
+                            'name': 'Exit',
+                            'shortcut': 'Ctrl+Q',
+                            'trigger': self.handle_exit_button_click
+                        }
+                    ]
+                }
+
+            self.bar_items = [self.ProjectMenuItem(self.structure)]
             return
+
+        @staticmethod
+        def handle_exit_button_click():
+            sys.exit(0)
 
         @property
         def bar_items(self):
