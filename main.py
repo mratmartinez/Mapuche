@@ -3,7 +3,7 @@
 import sys
 
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMenu
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMenu, QFileDialog
 
 class MainWindow(QMainWindow):
     class MenuBar(QMenuBar):
@@ -64,13 +64,19 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.resize(500, 500)
 
-        self.menu_bar = self.MenuBar({
+        self.menu_bar = {
                     'title': 'Project',
                     'items': [
                         {
                             'name': 'New',
                             'disabled': True,
                             'shortcut': 'Ctrl+N'
+                        },
+                        {
+                            'name': 'Open',
+                            'disabled': False,
+                            'shortcut': 'Ctrl+O',
+                            'trigger': self.open_dialog
                         },
                         None,
                         {
@@ -79,7 +85,13 @@ class MainWindow(QMainWindow):
                             'trigger': lambda: sys.exit(0)
                         }
                     ]
-                })
+                }
+        return
+    
+    def open_dialog(self):
+        dialog = QFileDialog()
+        dialog.show()
+        self.setFocus(dialog)
         return
 
     @property
@@ -89,7 +101,7 @@ class MainWindow(QMainWindow):
     @menu_bar.setter
     def menu_bar(self, menu_bar):
         self._menu_bar = menu_bar
-        self.setMenuWidget(menu_bar) 
+        self.setMenuWidget(self.MenuBar(menu_bar))
         return
 
 def main():
